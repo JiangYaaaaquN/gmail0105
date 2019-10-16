@@ -14,9 +14,9 @@ public class PmsUploadUtil {
 
     public static String uploadImage(MultipartFile multipartFile) {
 
+        String imgUrl =  "http://192.168.44.130";
 
-        String imgUrl="http://192.168.44.130";
-
+        // 上传图片到服务器
         // 配置fdfs的全局链接地址
         String tracker = PmsUploadUtil.class.getResource("/tracker.conf").getPath();// 获得配置文件的路径
 
@@ -32,35 +32,28 @@ public class PmsUploadUtil {
         TrackerServer trackerServer = null;
         try {
             trackerServer = trackerClient.getConnection();
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
         // 通过tracker获得一个Storage链接客户端
         StorageClient storageClient = new StorageClient(trackerServer,null);
 
-        //获得上传的二进制对象
-        byte[] bytes= new byte[0];
         try {
-            bytes = multipartFile.getBytes();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        //获取文件后缀
-        String or=multipartFile.getOriginalFilename();
-        int i=or.lastIndexOf("1");
-        String extName=or.substring(i+1);
+            byte[] bytes = multipartFile.getBytes();// 获得上传的二进制对象
 
-        String[] uploadInfos = new String[0];
-        try {
-            uploadInfos = storageClient.upload_file(bytes, extName, null);
+            // 获得文件后缀名
+            String originalFilename = multipartFile.getOriginalFilename();// a.jpg
+            System.out.println(originalFilename);
+            int i = originalFilename.lastIndexOf(".");
+            String extName = originalFilename.substring(i+1);
+
+            String[] uploadInfos = storageClient.upload_file(bytes, extName, null);
+
             for (String uploadInfo : uploadInfos) {
                 imgUrl += "/"+uploadInfo;
-
-                //url = url + uploadInfo;
             }
-            System.out.println(imgUrl);
         } catch (Exception e) {
             e.printStackTrace();
         }
