@@ -10,6 +10,9 @@ spring:
     consumer:
       timeout: 600000
       check: false
+    thymeleaf:
+      cache: false
+      mode: LEGACYHTML5
 server:
   port: 8082
 
