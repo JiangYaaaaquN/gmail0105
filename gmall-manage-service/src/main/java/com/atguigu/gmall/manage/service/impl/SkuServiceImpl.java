@@ -1,6 +1,7 @@
 package com.atguigu.gmall.manage.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSON;
 import com.atguigu.gmall.bean.PmsSkuAttrValue;
 import com.atguigu.gmall.bean.PmsSkuImage;
 import com.atguigu.gmall.bean.PmsSkuInfo;
@@ -10,7 +11,10 @@ import com.atguigu.gmall.manage.mapper.PmsSkuImageMapper;
 import com.atguigu.gmall.manage.mapper.PmsSkuInfoMapper;
 import com.atguigu.gmall.manage.mapper.PmsSkuSaleAttrValueMapper;
 import com.atguigu.gmall.service.SkuService;
+import com.atguigu.gmall.util.RedisUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import redis.clients.jedis.Jedis;
 
 import java.util.List;
 
@@ -25,6 +29,8 @@ public class SkuServiceImpl implements SkuService {
  PmsSkuSaleAttrValueMapper pmsSkuSaleAttrValueMapper;
  @Autowired
  PmsSkuImageMapper pmsSkuImageMapper;
+ @Autowired
+ RedisUtil redisUtil;
 
  @Override
  public void saveSkuInfo(PmsSkuInfo pmsSkuInfo) {
@@ -53,8 +59,7 @@ public class SkuServiceImpl implements SkuService {
   }
  }
 
- @Override
- public PmsSkuInfo getSkuById(String skuId) {
+ public PmsSkuInfo getSkuByIdProm(String skuId) {
   //sku商品对象
   PmsSkuInfo pmsSkuInfo=new PmsSkuInfo();
   pmsSkuInfo.setId(skuId);
@@ -66,5 +71,37 @@ public class SkuServiceImpl implements SkuService {
   List<PmsSkuImage> pmsSkuImages=pmsSkuImageMapper.select(pmsSkuImage);
   skuInfo.setSkuImageList(pmsSkuImages);
   return skuInfo;
+ }
+
+ @Override
+ public PmsSkuInfo getSkuById(String skuId) {
+
+  PmsSkuInfo pmsSkuInfo=new PmsSkuInfo();
+
+  //链接缓存
+  Jedis jedis =redisUtil.getJedis();
+
+  //查询缓存
+  String skuKey="sku:"+skuId+"info";
+  String skuJson=jedis.get(skuKey);
+  if (StringUtils.isNotBlank(skuJson)){ //相当于 if (skuJson!=null && !skuJson.equals(""))
+   pmsSkuInfo=JSON.parseObject(skuJson,PmsSkuInfo.class);
+  }else {
+   //如果缓存中没有，查询mysql
+  pmsSkuInfo =getSkuByIdProm(skuId);
+   if (pmsSkuInfo!=null){
+    //mysql查询结果存入redis
+    jedis.set("sku:"+skuId+":info",JSON.toJSONString(pmsSkuInfo));
+   }
+  }
+  jedis.close();
+  return pmsSkuInfo;
+ }
+
+ @Override
+ public List<PmsSkuInfo> getSkuSaleAttrValueListBySpu(String productId) {
+  List<PmsSkuInfo> pmsSkuInfos=pmsSkuInfoMapper.selectSkuSaleAttrValueListBySpu(productId);
+
+  return pmsSkuInfos;
  }
 }
