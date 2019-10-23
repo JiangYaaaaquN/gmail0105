@@ -18,11 +18,15 @@ spring:
   elasticsearch:
     jest:
       uris: http://192.168.44.130:9200
+      connection-timeout: 9000
+      read-timeout: 9000
 mybatis:
   mapper-locations: classpath:mapper/*Mapper.xml
   configuration:
     map-underscore-to-camel-case: true
+
 #\u65E5\u5FD7\u7EA7\u522B
 logging:
   level:
     root: info
+
