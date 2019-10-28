@@ -2,7 +2,7 @@ spring:
   dubbo:
     application: item-web
     registry:
-      address: 192.168.44.130:2181
+      address: 182.61.2.188:2181
       protocol: zookeeper
     protocol:
       name: dubbo
@@ -12,7 +12,7 @@ spring:
       check: false
     thymeleaf:
       cache: false
-      mode: LEGACYHTML5
+      mode: LBGACYHTML5
 server:
   port: 8082
 

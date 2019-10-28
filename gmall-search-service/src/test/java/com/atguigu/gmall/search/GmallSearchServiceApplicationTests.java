@@ -1,4 +1,4 @@
-package com.atguigugmall.search;
+package com.atguigu.gmall.search;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.atguigu.gmall.bean.PmsSearchSkuInfo;
@@ -27,10 +27,10 @@ import java.util.List;
 public class GmallSearchServiceApplicationTests {
 
     @Reference
-    SkuService skuService;
+     SkuService skuService;
 
     @Autowired
-    JestClient jestClient;
+     JestClient jestClient;
 
 
     public  void context() throws IOException {
@@ -64,6 +64,5 @@ public class GmallSearchServiceApplicationTests {
             jestClient.execute(put);
         }
     }
-
-    }
+  }
 
