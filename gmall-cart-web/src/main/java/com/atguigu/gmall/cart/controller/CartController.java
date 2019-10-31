@@ -57,7 +57,8 @@ public class CartController {
   omsCartItem.setIsChecked("0");
 
   //判断用户是否登录
-  String memberId="1";//"]";
+  String memberId=(String)request.getAttribute("memberId");
+  String nickname=(String)request.getAttribute("nickname");
 
   if (StringUtils.isBlank(memberId)){
    //用户未登录
@@ -127,7 +128,10 @@ public class CartController {
  @LoginRequired(loginSuccess = false)
  public String cartList(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response, HttpSession session){
   List<OmsCartItem> omsCartItems=new ArrayList<>();
-  String memberId="1";
+
+  String memberId=(String)request.getAttribute("memberId");
+  String nickname=(String)request.getAttribute("nickname");
+
   if (StringUtils.isNotBlank(memberId)){
    omsCartItems=cartService.cartList(memberId);
   }else {
@@ -160,14 +164,13 @@ public class CartController {
   return totalAmount;
  }
 
-
-
-
  @RequestMapping("checkCart")
  @LoginRequired(loginSuccess = false)
  public String checkCart(ModelMap modelMap,String isChecked,String skuId,HttpServletRequest request, HttpServletResponse response, HttpSession session){
 
-  String memberId="1";
+  String memberId=(String)request.getAttribute("memberId");
+  String nickname=(String)request.getAttribute("nickname");
+
   //调用服务，修改数据
   OmsCartItem omsCartItem=new OmsCartItem();
   omsCartItem.setMemberId(memberId);
