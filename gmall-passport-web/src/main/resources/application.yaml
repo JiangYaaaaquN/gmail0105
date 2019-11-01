@@ -11,5 +11,8 @@ spring:
     consumer:
       timeout: 6000
       check: false
+  thymeleaf:
+    cache: false
+    mode: LBGACYHTML5
 server:
   port: 8085
