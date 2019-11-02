@@ -1,0 +1,19 @@
+spring:
+  dubbo:
+    application: order-web
+    registry:
+      address: 182.61.2.188:2181
+      protocol: zookeeper
+    protocol:
+      name: dubbo
+      port: 20881
+    base-package: com.atguigu.gmall
+    consumer:
+      timeout: 6000
+      check: false
+  thymeleaf:
+    cache: false
+    mode: LBGACYHTML5
+server:
+  port: 8086
+

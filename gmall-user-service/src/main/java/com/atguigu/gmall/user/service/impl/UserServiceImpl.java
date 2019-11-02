@@ -100,10 +100,10 @@ public class UserServiceImpl implements UserService {
 
  private UmsMember loginFromDb(UmsMember umsMember) {
 
-  List<UmsMember> umsMembers= userMapper.select(umsMember);
+  UmsMember umsMembers= userMapper.selectOne(umsMember);
 
   if (umsMembers!=null){
-   return umsMembers.get(0);
+   return umsMembers;
   }
 
   return null;

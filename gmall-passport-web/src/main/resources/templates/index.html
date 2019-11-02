@@ -87,6 +87,7 @@
 		           alert("用户名或密码错误！");
 			   }else{
                    //验证token是否为空或者异常
+				   //alert($("#ReturnUrl").val());
                    window.location.href=$("#ReturnUrl").val()+"?token"+token;
 			   }
            });

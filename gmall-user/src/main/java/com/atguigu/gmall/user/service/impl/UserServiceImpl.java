@@ -25,13 +25,13 @@ public class UserServiceImpl implements UserService {
  UserMapper userMapper;
  @Resource
  UmsMemberReceiveAddressMapper umsMemberReceiveAddressMapper;
- @Autowired
+ @Resource
  RedisUtil redisUtil;
 
  @Override
  public List<UmsMember> getAllUser() {
-  List<UmsMember> umsMembersList = userMapper.selectAll();
-  return umsMembersList;
+  List<UmsMember> umsMembersList=userMapper.selectAll();
+  return  umsMembersList;
  }
 
  @Override
@@ -42,9 +42,9 @@ public class UserServiceImpl implements UserService {
 //
 //  List<UmsMemberReceiveAddresss> umsMemberReceiveAddressses= umsMemberReceiveAddressMapper.selectByExample(umsMemberReceiveAddresss);
 //  List<UmsMemberReceiveAddress> umsMemberReceiveAddressses=umsMemberReceiveAddressMapper.select(umsMemberReceiveAddresss);
-  Example example = new Example(UmsMemberReceiveAddress.class);
-  example.createCriteria().andEqualTo("memberId", memberId);
-  List<UmsMemberReceiveAddress> umsMemberReceiveAddressses = umsMemberReceiveAddressMapper.selectByExample(example);
+  Example example=new Example(UmsMemberReceiveAddress.class);
+  example.createCriteria().andEqualTo("memberId",memberId);
+  List<UmsMemberReceiveAddress> umsMemberReceiveAddressses=umsMemberReceiveAddressMapper.selectByExample(example);
 
   return umsMemberReceiveAddressses;
  }
@@ -63,15 +63,41 @@ public class UserServiceImpl implements UserService {
      return umsMemberFromCache;
     }
    }
-    //开启数据库
-    UmsMember umsMemberFromDb=loginFromDb(umsMember);
-    if (umsMemberFromDb!=null){
-     jedis.setex("user:"+umsMember.getPassword()+":info",60*60*24,JSON.toJSONString(umsMemberFromDb));
-    }
-    return umsMemberFromDb;
+   //开启数据库
+   UmsMember umsMemberFromDb=loginFromDb(umsMember);
+   if (umsMemberFromDb!=null){
+    jedis.setex("user:"+umsMember.getPassword()+":info",60*60*24,JSON.toJSONString(umsMemberFromDb));
+   }
+   return umsMemberFromDb;
   } finally {
    jedis.close();
   }
+ }
+
+ @Override
+ public void addUserToken(String token, String memberId) {
+  Jedis jedis=redisUtil.getJedis();
+
+  jedis.setex("user:"+memberId+":token",60*60*2,token);
+
+  jedis.close();
+ }
+
+ @Override
+ public void addOauthUser(UmsMember umsMember) {
+  userMapper.insertSelective(umsMember);
+ }
+
+ @Override
+ public UmsMember checkOauthUser(UmsMember umsCheck) {
+  UmsMember umsMember= userMapper.selectOne(umsCheck);
+  return umsMember;
+ }
+
+ @Override
+ public UmsMember getOauthUser(UmsMember umsMemberCheck) {
+  UmsMember umsMember=userMapper.selectOne(umsMemberCheck);
+  return umsMember;
  }
 
  private UmsMember loginFromDb(UmsMember umsMember) {

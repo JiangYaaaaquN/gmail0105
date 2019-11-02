@@ -16,9 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class AuthInterceptor extends HandlerInterceptorAdapter{
+public class AuthInterceptor extends HandlerInterceptorAdapter {
 
-public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
     //拦截代码
 
@@ -88,3 +88,6 @@ public boolean preHandle(HttpServletRequest request, HttpServletResponse respons
     return true;
 }
 }
+
+
+
