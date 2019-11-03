@@ -65,7 +65,7 @@ public class PassportController {
 
   UmsMember umsCheck = new UmsMember();
   umsCheck.setSourceUid(umsMember.getSourceUid());
-  UmsMember umsMemberCheck = userService.checkOauthUser(umsCheck);
+  UmsMember umsMemberCheck = userService.checkOauthUser(umsCheck);//检查该用户以前是否登陆过系统
 
   if(umsMemberCheck==null){
    userService.addOauthUser(umsMember);
@@ -75,10 +75,10 @@ public class PassportController {
 
   // 生成jwt的token，并且重定向到首页，携带该token
   String token = null;
-  String memberId = umsMember.getId();
+  String memberId = umsMember.getId();//rpc的主键返回策略失效
   String nickname = umsMember.getNickname();
   Map<String,Object> userMap = new HashMap<>();
-  userMap.put("memberId",memberId);
+  userMap.put("memberId",memberId);//是保存数据库后逐渐返回策略生成的id
   userMap.put("nickname",nickname);
 
 
