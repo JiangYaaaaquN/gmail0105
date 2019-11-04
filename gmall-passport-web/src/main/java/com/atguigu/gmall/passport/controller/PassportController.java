@@ -48,7 +48,7 @@ public class PassportController {
   String user_json = HttpclientUtil.doGet(show_user_url);
   Map<String,Object> user_map = JSON.parseObject(user_json,Map.class);
 
-  // 将用户信息保存数据库，用户类型设置为微博用户
+// 将用户信息保存数据库，用户类型设置为微博用户
   UmsMember umsMember = new UmsMember();
   umsMember.setSourceType("2");
   umsMember.setAccessCode(code);
@@ -65,20 +65,20 @@ public class PassportController {
 
   UmsMember umsCheck = new UmsMember();
   umsCheck.setSourceUid(umsMember.getSourceUid());
-  UmsMember umsMemberCheck = userService.checkOauthUser(umsCheck);//检查该用户以前是否登陆过系统
+  UmsMember umsMemberCheck = userService.checkOauthUser(umsCheck);// 检查该用户(社交用户)以前是否登陆过系统
 
   if(umsMemberCheck==null){
-   userService.addOauthUser(umsMember);
+   umsMember = userService.addOauthUser(umsMember);
   }else{
    umsMember = umsMemberCheck;
   }
 
   // 生成jwt的token，并且重定向到首页，携带该token
   String token = null;
-  String memberId = umsMember.getId();//rpc的主键返回策略失效
+  String memberId = umsMember.getId();// rpc的主键返回策略失效
   String nickname = umsMember.getNickname();
   Map<String,Object> userMap = new HashMap<>();
-  userMap.put("memberId",memberId);//是保存数据库后逐渐返回策略生成的id
+  userMap.put("memberId",memberId);// 是保存数据库后主键返回策略生成的id
   userMap.put("nickname",nickname);
 
 
@@ -167,7 +167,7 @@ public class PassportController {
 
  @RequestMapping("index")
  public String index(String ReturnUrl, ModelMap map){
-  System.out.println(ReturnUrl);
+
   map.put("ReturnUrl",ReturnUrl);
   return "index";
  }

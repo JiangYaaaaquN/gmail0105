@@ -60,13 +60,13 @@
 			<!--地址-->
 			<div class="top-3">
 				<ul >
-				 <li class=".address default selected" th:each="userAddress:${userAddressList}"  >
-					 <input   name="deliveryAddress" type="radio"  th:value="${userAddress.id}"  th:checked="${userAddress.isDefault}=='1'" onclick="changeAddress()">
-					<span  th:text="${userAddress.name}" >收件人AAAA </span><span th:text="${userAddress.province}+${userAddress.city}+${userAddress.detailAddress}"   >具体地址111 </span>
-				 </li>
+					<li class=".address default selected" th:each="userAddress:${userAddressList}"  >
+						<input   name="deliveryAddress" type="radio"  th:value="${userAddress.id}"   th:checked="${userAddress.defaultStatus}=='1'" onclick="changeAddress()">
+						<span  th:text="${userAddress.name}" >收件人AAAA </span><span th:text="${userAddress.province}+${userAddress.city}+${userAddress.region}+${userAddress.detailAddress}"   >具体地址111 </span>
+					</li>
 				</ul>
 			</div>
-		 
+
 			</form>
 			<div class="hh1"/></div>
 		<!--********************************************************************************************-->
@@ -176,4 +176,4 @@
 		</script>
 	</body>
 
-</html
+</html>

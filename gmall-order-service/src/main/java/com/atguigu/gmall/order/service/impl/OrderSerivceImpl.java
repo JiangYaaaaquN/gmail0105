@@ -1,6 +1,7 @@
 package com.atguigu.gmall.order.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.dubbo.config.annotation.Service;
 import com.atguigu.gmall.bean.OmsOrder;
 import com.atguigu.gmall.bean.OmsOrderItem;
 import com.atguigu.gmall.order.mapper.OmsOrderItemMapper;
@@ -14,7 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
- class OrderSerivceImpl implements OrderService {
+@Service
+public class OrderSerivceImpl implements OrderService {
 
  @Autowired
  RedisUtil redisUtil;
@@ -77,6 +79,15 @@ import java.util.UUID;
    //删除购物车数据
    //cartService.delCart();
   }
+ }
+
+ @Override
+ public OmsOrder getOrderByOutTradeNo(String outTradeNo) {
+
+  OmsOrder omsOrder=new OmsOrder();
+  omsOrder.setOrderSn(outTradeNo);
+  OmsOrder omsOrder1=omsOrderMapper.selectOne(omsOrder);
+  return omsOrder1;
  }
 
 }

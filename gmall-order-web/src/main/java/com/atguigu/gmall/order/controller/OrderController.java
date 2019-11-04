@@ -13,6 +13,7 @@ import com.atguigu.gmall.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,14 +45,16 @@ public class OrderController {
   String memberId = (String) request.getAttribute("memberId");
   String nickname = (String) request.getAttribute("nickname");
 
-  //收件人地址列表
+  // 收件人地址列表
   List<UmsMemberReceiveAddress> umsMemberReceiveAddresses = userService.getReceiveAddressByMemberId(memberId);
-  //将购物车集合转化为页面计算结算清单
+
+  // 将购物车集合转化为页面计算清单集合
   List<OmsCartItem> omsCartItems = cartService.cartList(memberId);
 
   List<OmsOrderItem> omsOrderItems = new ArrayList<>();
+
   for (OmsCartItem omsCartItem : omsCartItems) {
-   //每循环一个购物车对象就封装一个商品的详情
+   // 每循环一个购物车对象，就封装一个商品的详情到OmsOrderItem
    if (omsCartItem.getIsChecked().equals("1")) {
     OmsOrderItem omsOrderItem = new OmsOrderItem();
     omsOrderItem.setProductName(omsCartItem.getProductName());
@@ -59,11 +62,12 @@ public class OrderController {
     omsOrderItems.add(omsOrderItem);
    }
   }
+
   modelMap.put("omsOrderItems", omsOrderItems);
   modelMap.put("userAddressList", umsMemberReceiveAddresses);
   modelMap.put("totalAmount", getTotaAmount(omsCartItems));
 
-  //生成交易密码，为了在提交订单时做交易码的校验
+  // 生成交易码，为了在提交订单时做交易码的校验
   String tradeCode = orderService.genTradeCode(memberId);
   modelMap.put("tradeCode", tradeCode);
   return "trade";
@@ -83,7 +87,7 @@ public class OrderController {
 
  @RequestMapping("submitOrder")
  @LoginRequired(loginSuccess = true)
- public String submitOrder(String receiveAddressId, String tradeCode, BigDecimal totalAmount,HttpServletRequest request, HttpServletResponse response, HttpSession session, ModelMap modelMap) {
+ public ModelAndView submitOrder(String receiveAddressId, String tradeCode, BigDecimal totalAmount, HttpServletRequest request, HttpServletResponse response, HttpSession session, ModelMap modelMap) {
 
   String memberId = (String) request.getAttribute("memberId");
   String nickname = (String) request.getAttribute("nickname");
@@ -135,7 +139,8 @@ public class OrderController {
      //验价
      boolean b = skuService.checkPrice(omsCartItem.getProductSkuId(),omsCartItem.getPrice());
      if (b == false) {
-      return "tradeFail";
+      ModelAndView mv=new ModelAndView("tradeFail");
+      return mv;
      }
      //验库存，远程调用库存系统
      omsOrderItem.setProductPic(omsCartItem.getProductPic());
@@ -163,9 +168,13 @@ public class OrderController {
    orderService.saveOrder(omsOrder);
 
    //重定向到支付系统
+   ModelAndView mv=new ModelAndView("redirect:http://payment.gmall.com:8087/index");
+   mv.addObject("outTradeNo",outTradeNo);
+   mv.addObject("totalAmount",totalAmount);
+   return mv;
   } else {
-   return "tradeFail";
+   ModelAndView mv=new ModelAndView("tradeFail");
+   return mv;
   }
-  return null;
  }
 }
