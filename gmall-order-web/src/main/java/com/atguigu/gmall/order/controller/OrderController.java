@@ -44,6 +44,7 @@ public class OrderController {
 
   String memberId = (String) request.getAttribute("memberId");
   String nickname = (String) request.getAttribute("nickname");
+  cartService.flushCartCache(memberId);
 
   // 收件人地址列表
   List<UmsMemberReceiveAddress> umsMemberReceiveAddresses = userService.getReceiveAddressByMemberId(memberId);
@@ -84,6 +85,7 @@ public class OrderController {
   }
   return totalAmount;
  }
+
 
  @RequestMapping("submitOrder")
  @LoginRequired(loginSuccess = true)

@@ -157,9 +157,9 @@ public class SkuServiceImpl implements SkuService {
 
   PmsSkuInfo pmsSkuInfo=new PmsSkuInfo();
   pmsSkuInfo.setId(productSkuId);
-  pmsSkuInfoMapper.selectOne(pmsSkuInfo);
+  PmsSkuInfo pmsSkuInfo1 = pmsSkuInfoMapper.selectOne(pmsSkuInfo);
 
-  BigDecimal price=pmsSkuInfo.getPrice();
+  BigDecimal price=pmsSkuInfo1.getPrice();
 
   if (price.compareTo(productPrice)==0){
    b=true;

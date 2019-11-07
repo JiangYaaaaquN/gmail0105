@@ -87,7 +87,7 @@
 				<h5>商家：自营</h5>
 				<!--图片-->
 				<div class="yun1" th:each="omsOrderItem:${omsOrderItems}"  >
-					<img  th:src="${omsOrderItem.productPid}" class="yun"/>
+					<img  th:src="${omsOrderItem.productPic}" class="yun"/>
 					<div class="mi">
 						<div><p style="width: 500px;" th:text="${omsOrderItem.productName}" >商品名称111111111111 </p> <span style="float: right"> <span align="center" style="color: red" >   </span> <span   th:text="'X '+${omsOrderItem.productName}"> X 1   </span> <span  >有货</span>  <span  >无货</span>  </span> </div>
 
@@ -119,9 +119,9 @@
 		</div>
 
 		<form action="./submitOrder" method="post" id="orderForm">
-			<input name="receiveAddressId" id="receiveAddressId" type="hidden"/>
-			<input name="totalAmount" id="totalAmount" type="hidden" th:value="${totalAmount}"/>
 
+			<input name="receiveAddressId" value="1" id="receiveAddressId" type="hidden"/>
+			<input name="totalAmount" id="totalAmount" type="hidden" th:value="${totalAmount}"/>
 			<input name="tradeCode" type="hidden"  th:value="${tradeCode}"  />
 		</form>
 		<script>

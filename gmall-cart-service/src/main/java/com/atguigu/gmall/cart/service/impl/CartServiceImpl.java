@@ -77,6 +77,7 @@ public class CartServiceImpl implements CartService {
   List<OmsCartItem> omsCartItems=new ArrayList<>();
   try {
    jedis=redisUtil.getJedis();
+
    List<String> hvals=jedis.hvals("user:"+userId+":cart");
    for (String hval : hvals) {
     OmsCartItem omsCartItem=JSON.parseObject(hval,OmsCartItem.class);

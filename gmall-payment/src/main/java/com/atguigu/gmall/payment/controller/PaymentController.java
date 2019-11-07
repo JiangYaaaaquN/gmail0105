@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
+import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.atguigu.gmall.annotations.LoginRequired;
 import com.atguigu.gmall.bean.OmsOrder;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,8 +29,8 @@ import java.util.Map;
 @Controller
 public class PaymentController {
 
- @Autowired
- AlipayClient alipayClient;
+// @Autowired
+// AlipayClient alipayClient;
  @Autowired
  PaymentService paymentService;
  @Reference
@@ -76,42 +78,73 @@ public class PaymentController {
  @RequestMapping("alipay/submit")
  @LoginRequired(loginSuccess = true)
  @ResponseBody
- public String alipay(String outTradeNo, BigDecimal totalAmount, ModelMap modelMap, HttpServletRequest request) {
+ public String send(HttpServletRequest request, HttpServletResponse response) throws Exception {
+  //获得初始化的AlipayClient
+  AlipayClient alipayClient = new DefaultAlipayClient(AlipayConfig.gatewayUrl, AlipayConfig.app_id, AlipayConfig.merchant_private_key, "json", AlipayConfig.charset, AlipayConfig.alipay_public_key, AlipayConfig.sign_type);
 
-  //获得一个支付宝请求的客户端（它并不是一个链接，而是一个封装好的http的表单请求）
-  String form=null;
-  AlipayTradePagePayRequest alipayRequest = new AlipayTradePagePayRequest();//创建API对应的request
-  //回调函数
-  alipayRequest.setReturnUrl(AlipayConfig.return_payment_url);
-  alipayRequest.setNotifyUrl(AlipayConfig.notify_payment_url);
-  Map<String,Object> map=new HashMap<>();
-  map.put("out_trade_no",outTradeNo);
-  map.put("product_code","FAST_INSTANT_TRADE_PAY");
-  map.put("total_amount",totalAmount);
-  map.put("subject","dd");
+  //设置请求参数
+  AlipayTradePagePayRequest alipayRequest = new AlipayTradePagePayRequest();
+  alipayRequest.setReturnUrl(AlipayConfig.return_url);
+  alipayRequest.setNotifyUrl(AlipayConfig.notify_url);
 
-  String param=JSON.toJSONString(map);
+  //商户订单号，商户网站订单系统中唯一订单号，必填
+  String out_trade_no = new String(request.getParameter("outTradeNo").getBytes("ISO-8859-1"), "UTF-8");
+  //付款金额，必填
+  String total_amount = new String(request.getParameter("totalAmount").getBytes("ISO-8859-1"), "UTF-8");
+  //订单名称，必填
+  String subject = new String("测试");
+  //商品描述，可空
+  String body = new String("");
 
-  alipayRequest.setBizContent(param);
-  try {
-   form=alipayClient.pageExecute(alipayRequest).getBody();//调用SDK生成表单
-  } catch (AlipayApiException e) {
-   e.printStackTrace();
-  }
+  alipayRequest.setBizContent("{\"out_trade_no\":\"" + out_trade_no + "\","
+          + "\"total_amount\":\"" + total_amount + "\","
+          + "\"subject\":\"" + subject + "\","
+          + "\"body\":\"" + body + "\","
+          + "\"product_code\":\"FAST_INSTANT_TRADE_PAY\"}");
+
+  //若想给BizContent增加其他可选请求参数，以增加自定义超时时间参数timeout_express来举例说明
+  //alipayRequest.setBizContent("{\"out_trade_no\":\""+ out_trade_no +"\","
+  //		+ "\"total_amount\":\""+ total_amount +"\","
+  //		+ "\"subject\":\""+ subject +"\","
+  //		+ "\"body\":\""+ body +"\","
+  //		+ "\"timeout_express\":\"10m\","
+  //		+ "\"product_code\":\"FAST_INSTANT_TRADE_PAY\"}");
+  //请求参数可查阅【电脑网站支付的API文档-alipay.trade.page.pay-请求参数】章节
+
+  String head = "<html><head><meta http-equiv='Content-Type' content='text/html;charset=utf-8'></head>";
+
+  //请求
+  String result = alipayClient.pageExecute(alipayRequest).getBody();
+
+  String buttom = "<body></body></html>";
+//  Map<String,Object> map=new HashMap<>();
+//  map.put("out_trade_no",outTradeNo);
+//  map.put("product_code","FAST_INSTANT_TRADE_PAY");
+//  map.put("total_amount",totalAmount);
+//  map.put("subject","dd");
+
+//  String param=JSON.toJSONString(map);
+
+//  alipayRequest.setBizContent(param);
+//  try {
+//   form=alipayClient.pageExecute(alipayRequest).getBody();//调用SDK生成表单
+//  } catch (AlipayApiException e) {
+//   e.printStackTrace();
+//  }
 
   //生成并且保存用户的支付信息
-  OmsOrder omsOrder= orderService.getOrderByOutTradeNo(outTradeNo);
+  OmsOrder omsOrder= orderService.getOrderByOutTradeNo(out_trade_no);
   PaymentInfo paymentInfo=new PaymentInfo();
   paymentInfo.setCreateTime(new Date());
   paymentInfo.setOrderId(omsOrder.getId());
-  paymentInfo.setOrderSn(outTradeNo);
+  paymentInfo.setOrderSn(out_trade_no);
   paymentInfo.setPaymentStatus("未付款");
   paymentInfo.setSubject("谷粒商城商品意见");
-  paymentInfo.setTotalAmount(totalAmount);
+  paymentInfo.setTotalAmount(new BigDecimal(total_amount));
   paymentService.savePaymentInfo(paymentInfo);
 
   //提交请求到支付宝
-  return form;
+  return result;
  }
 
  @RequestMapping("index")

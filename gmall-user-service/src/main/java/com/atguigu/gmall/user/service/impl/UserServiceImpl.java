@@ -11,9 +11,6 @@ import com.atguigu.gmall.util.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.Jedis;
-import tk.mybatis.mapper.entity.Example;
-
-import javax.annotation.Resource;
 import java.util.List;
 
 @Service

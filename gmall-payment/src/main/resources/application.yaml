@@ -22,6 +22,11 @@ spring:
   thymeleaf:
         cache: false
         mode: LBGACYHTML5
+  activemq:
+    broker-url: tcp://182.61.2.188:61616
+activemq:
+ listener:
+  enable: true
 server:
   port: 8087
 
@@ -29,4 +34,5 @@ mybatis:
   mapper-locations: classpath:mapper/*Mapper.xml
   configuration:
     map-underscore-to-camel-case: true
+
 

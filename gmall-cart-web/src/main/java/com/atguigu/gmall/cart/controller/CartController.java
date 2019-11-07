@@ -103,11 +103,9 @@ public class CartController {
     omsCartItemFromDb.setQuantity(omsCartItem.getQuantity());
     cartService.updateCart(omsCartItemFromDb);
    }
-
    //同步缓存
    cartService.flushCartCache(memberId);
   }
-
   return "redirect:/success.html";
  }
 
@@ -187,6 +185,4 @@ public class CartController {
   modelMap.put("totalAmount", totalAmount);
   return "cartListInner";
  }
-
-
 }
